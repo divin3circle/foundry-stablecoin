@@ -54,6 +54,7 @@ contract DSCEngine {
     error DSCEngine__TokenNotSupported();
     error DSCEngine__DepositCollateralFailed();
     error DSCEngine__HealthFactorTooLow(uint256 healthFactor);
+    error DSCEngine__MintDscFailed();
 
     /**
      *
@@ -154,6 +155,10 @@ contract DSCEngine {
     function mintDsc(uint256 amountDscToMint) external moreThanZero(amountDscToMint) {
         s_dscMinted[msg.sender] += amountDscToMint;
         _revertIfHealthFactorIsBroken(msg.sender);
+        bool minted = i_dsc.mint(msg.sender, amountDscToMint);
+        if (!minted) {
+            revert DSCEngine__MintDscFailed();
+        }
         
     }
 
