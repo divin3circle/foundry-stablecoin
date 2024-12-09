@@ -27,7 +27,7 @@ import {DecentralizedStableCoin} from "./DecentralizedStableCoin.sol";
 import {AggregatorV3Interface} from
     "../lib/chainlink-brownie-contracts/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {ReentrancyGuard} from "../lib/openzeppelin-contracts/contracts/security/ReentrancyGuard.sol";
 /*
 * @title Decentralized Stable Coin
 * @author divin3circle
@@ -220,8 +220,15 @@ contract DSCEngine {
     }
 
     function getUsdValue(address token, uint256 amount) public view returns (uint256) {
-        AggregatorV3Interface priceFeed = AggregatorV3Interface(s_priceFeeds[token]);
+        address priceFeedAddress = s_priceFeeds[token];
+        if (priceFeedAddress == address(0)) {
+            revert DSCEngine__TokenNotSupported();
+        }
+        AggregatorV3Interface priceFeed = AggregatorV3Interface(priceFeedAddress);
         (, int256 price,,,) = priceFeed.latestRoundData();
+        if (price <= 0) {
+            revert DSCEngine__TokenNotSupported();
+        }
         return ((uint256(price) * ADDITIONAL_FEED_PRECISION) * amount) / PRECISION;
     }
 }
