@@ -16,6 +16,8 @@ contract DSCEngineTest is Test {
     address ethUsdPriceFeed;
     address weth;
 
+    address public USER = makeAddr("user");
+
 
     function setUp() public {
         deployer = new DeployDSC();
@@ -31,4 +33,13 @@ contract DSCEngineTest is Test {
         uint256 actualUsdValue = dsce.getUsdValue(weth, ethAmount);
         assertEq(expectedUsd, actualUsdValue);
     }
+
+     /*
+    * DEPOSIT COLLATERAL TESTS 
+    */
+   function testRevertsIfCollateralIsZero() public view {
+    vm.startPrank(USER);
+    
+   }
+
 }
