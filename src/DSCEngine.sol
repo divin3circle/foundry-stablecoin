@@ -122,7 +122,18 @@ contract DSCEngine {
      * EXTERNAL FUNCTIONS ****
      *
      */
-    function depositCollateralAndMintDsc() external {}
+     /**
+     * @param tokenCollateralAddress The address of the token to deposit as collateral
+     * @param amountCollateral The amount of the token to deposit as collateral
+     * @param amountDscToMint The amount of DSC to mint
+     * @notice this function will deposit you collateral and mint DSC in one 
+     * transaction 
+     *
+     */
+    function depositCollateralAndMintDsc(address tokenCollateralAddress, uint256 amountCollateral, uint256 amountDscToMint) external {
+        depositCollateral(tokenCollateralAddress, amountCollateral);
+        mintDsc(amountDscToMint);
+    }
 
     /*
     * @notice CEI
@@ -131,7 +142,7 @@ contract DSCEngine {
     *
     */
     function depositCollateral(address tokenCollateralAddress, uint256 collateralAmount)
-        external
+        public
         moreThanZero(collateralAmount)
         isAllowedToken(tokenCollateralAddress)
     {
@@ -153,7 +164,7 @@ contract DSCEngine {
     * @notice they must have more collateral value that the minimum threshold
     *
     */
-    function mintDsc(uint256 amountDscToMint) external moreThanZero(amountDscToMint) {
+    function mintDsc(uint256 amountDscToMint) public moreThanZero(amountDscToMint) {
         s_dscMinted[msg.sender] += amountDscToMint;
         _revertIfHealthFactorIsBroken(msg.sender);
         bool minted = i_dsc.mint(msg.sender, amountDscToMint);
